@@ -3,21 +3,28 @@
   "owner": {
     "name": "yoggu"
   },
+  "metadata": {
+    "description": "Claude Code plugins for Drupal development and skill creation",
+    "version": "1.0.0"
+  },
   "plugins": [
     {
       "name": "drupal-updates",
-      "source": "./drupal-updates",
-      "description": "Perform Drupal core and contributed module updates using Composer"
+      "description": "Perform Drupal core and contributed module updates using Composer",
+      "source": "./",
+      "skills": ["./skills/drupal-updates"]
     },
     {
       "name": "drupal-update-orchestrator",
-      "source": "./drupal-update-orchestrator",
-      "description": "Orchestrate Drupal updates across multiple projects"
+      "description": "Orchestrate Drupal updates across multiple projects",
+      "source": "./",
+      "skills": ["./skills/drupal-update-orchestrator"]
     },
     {
       "name": "skill-creator",
-      "source": "./skill-creator",
-      "description": "Guide for creating effective Claude Code skills"
+      "description": "Guide for creating effective Claude Code skills",
+      "source": "./",
+      "skills": ["./skills/skill-creator"]
     }
   ]
 }

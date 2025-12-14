@@ -1,9 +1,0 @@
-{
-  "name": "drupal-updates",
-  "description": "Perform Drupal core and contributed module updates using Composer. Use when asked to update Drupal core, contrib modules, check for updates, run database updates, or handle patch failures.",
-  "version": "1.0.0",
-  "author": {
-    "name": "yoggu"
-  },
-  "keywords": ["drupal", "updates", "composer", "cms"]
-}

@@ -1,9 +1,0 @@
-{
-  "name": "drupal-update-orchestrator",
-  "description": "Orchestrate Drupal updates across multiple projects. Use when asked to update multiple Drupal sites, batch update Drupal projects, manage updates across a portfolio of Drupal sites, or run Drupal updates on several projects at once.",
-  "version": "1.0.0",
-  "author": {
-    "name": "yoggu"
-  },
-  "keywords": ["drupal", "updates", "orchestration", "multi-project", "batch"]
-}
