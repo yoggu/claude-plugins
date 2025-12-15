@@ -56,8 +56,8 @@ ddev drush cr
 ### 3. Update Local Main Branch
 Ensure your local main/master branch is up to date:
 ```bash
-git checkout main && git pull
-# or: git checkout master && git pull
+git checkout main && git pull origin main
+# or: git checkout master && git pull origin master
 ```
 
 ### 4. Create Feature Branch
@@ -141,8 +141,23 @@ Run existing Playwright tests if the project has them. Otherwise, do a smoke tes
 ### 10. Commit Changes
 ```bash
 git add composer.json composer.lock config/sync/
-git commit -m "Update Drupal core X.X.X → Y.Y.Y and contrib modules"
 ```
+
+**Commit message format** - include all updated packages with version changes:
+```
+chore: update Drupal core and contrib modules
+
+Updated packages:
+- drupal/core: 10.4.3 → 10.5.8
+- drupal/admin_toolbar: 3.4.0 → 3.5.0
+- drupal/paragraphs: 1.17.0 → 1.18.0
+- drupal/webform: 6.2.3 → 6.2.5
+...
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+Use the output from step 1 (`composer outdated "drupal/*"`) to list all packages that were updated.
 
 ### 11. Create Pull Request
 

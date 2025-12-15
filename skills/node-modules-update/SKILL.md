@@ -20,9 +20,14 @@ Perform safe, systematic Node.js dependency updates with proper version control,
 
 Ensure your local main/master branch is up to date:
 ```bash
-git checkout main && git pull
-# or: git checkout master && git pull
+git checkout main && git pull origin main
+# or: git checkout master && git pull origin master
 ```
+
+This step is critical to:
+- Avoid merge conflicts later
+- Ensure you're building on the latest code
+- Prevent duplicate or conflicting PRs
 
 ### 2. Create Feature Branch
 
@@ -31,7 +36,16 @@ Create a dedicated branch with date for the update:
 git checkout -b chore/update-node-modules-$(date +%Y%m%d)
 ```
 
-### 3. Update Dependencies
+### 3. Check Outdated Packages
+
+Before updating, capture the current state of outdated packages:
+```bash
+npm outdated
+```
+
+Save this output - you'll need it for the commit message. Note the package names and version changes (Current → Wanted).
+
+### 4. Update Dependencies
 
 Run npm update to upgrade packages within semver constraints:
 ```bash
@@ -43,31 +57,50 @@ Review output for:
 - Any vulnerabilities found
 - Funding information (optional)
 
-### 4. Verify Build
+### 5. Run Lint
+
+Run linting to check for issues:
+```bash
+npm run lint
+```
+
+**If lint fails due to updated packages:**
+1. Read the error messages to understand the issue
+2. Fix the code to resolve lint errors (e.g., updated API usage, new required props)
+3. Re-run lint to verify fixes
+4. Only skip the update if the fix is too complex or risky
+
+### 6. Verify Build
 
 Run the build to ensure updated packages work correctly:
 ```bash
 npm run build
 ```
 
-Check for:
-- Successful compilation
-- No TypeScript errors
-- No build warnings (if critical)
+**If build fails due to updated packages:**
+1. Read the error messages carefully (TypeScript errors, module resolution, etc.)
+2. Fix the breaking changes in the code:
+   - Update type annotations if types changed
+   - Adjust API calls if signatures changed
+   - Update imports if package structure changed
+3. Re-run the build to verify fixes
+4. Only skip the update if the fix is too complex or requires significant refactoring
 
-### 5. Run Tests
+### 7. Run Tests
 
 Execute the test suite to catch regressions:
 ```bash
 npm run test
 ```
 
-If tests fail:
-- Investigate if failure is related to updates
-- Check changelog of updated packages for breaking changes
-- Consider pinning problematic packages
+**If tests fail due to updated packages:**
+1. Investigate if failure is related to the updates
+2. Fix test code or application code as needed
+3. Check changelog of updated packages for migration guides
+4. Re-run tests to verify fixes
+5. Only skip the update if fixes are too complex
 
-### 6. Review Changes
+### 8. Review Changes
 
 Check what files were modified:
 ```bash
@@ -76,16 +109,34 @@ git status
 
 Expected changes:
 - `package-lock.json` - Updated dependency tree
+- Any source files you fixed during lint/build/test steps
 
-### 7. Commit Changes
+### 9. Commit Changes
 
-Stage and commit the update:
+Stage and commit the update with detailed version information:
 ```bash
 git add package-lock.json
-git commit -m "chore: update node modules"
+# Include any files you fixed:
+git add <fixed-files>
 ```
 
-### 8. Create Pull Request
+**Commit message format** - include all updated packages with version changes:
+```
+chore: update node modules
+
+Updated packages:
+- next: 16.0.5 → 16.0.10
+- react: 19.2.0 → 19.2.3
+- typescript: 5.6.2 → 5.7.2
+- eslint: 9.15.0 → 9.16.0
+...
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+Use the output from step 3 (`npm outdated`) to list all packages that were updated.
+
+### 10. Create Pull Request
 
 Push the branch and create a pull request:
 

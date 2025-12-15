@@ -91,6 +91,7 @@ If the update fails, return the error message."
 
 **Subagent configuration:**
 - `subagent_type`: "general-purpose"
+- `model`: "opus"
 - `run_in_background`: true (to run updates in parallel)
 - Wait for all subagents to complete using TaskOutput
 
