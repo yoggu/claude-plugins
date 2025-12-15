@@ -1,47 +1,10 @@
 #!/bin/bash
-# Discover Drupal projects in configured directories
-# Outputs JSON array of project info: path, name, drupal_version
+# Discover Drupal and Node.js projects in the current directory (1 level deep)
+# Outputs JSON array of project info: path, name, type, version
 
 set -e
 
-CONFIG_FILE="${HOME}/.config/drupal-update-orchestrator/config.yml"
-
-# Check if config file exists
-if [[ ! -f "$CONFIG_FILE" ]]; then
-    echo "Error: Config file not found at $CONFIG_FILE" >&2
-    echo "Create it based on the example in references/config-example.yml" >&2
-    exit 1
-fi
-
-# Parse search directories from YAML config (basic parsing without yq)
-parse_search_dirs() {
-    local in_search_dirs=false
-    while IFS= read -r line; do
-        # Skip comments and empty lines
-        [[ "$line" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "${line// }" ]] && continue
-
-        # Check if we're in search_directories section
-        if [[ "$line" =~ ^search_directories: ]]; then
-            in_search_dirs=true
-            continue
-        fi
-
-        # Check if we've hit another top-level key
-        if [[ "$line" =~ ^[a-z_]+: && ! "$line" =~ ^[[:space:]]+ ]]; then
-            in_search_dirs=false
-            continue
-        fi
-
-        # Parse list items under search_directories
-        if $in_search_dirs && [[ "$line" =~ ^[[:space:]]*-[[:space:]]*(.*) ]]; then
-            dir="${BASH_REMATCH[1]}"
-            # Expand tilde
-            dir="${dir/#\~/$HOME}"
-            echo "$dir"
-        fi
-    done < "$CONFIG_FILE"
-}
+SEARCH_DIR="${1:-$(pwd)}"
 
 # Check if a directory contains a Drupal project
 is_drupal_project() {
@@ -55,15 +18,37 @@ is_drupal_project() {
     grep -q '"drupal/core-recommended"' "$composer_json" 2>/dev/null
 }
 
+# Check if a directory contains a Node.js project (but not Drupal)
+is_node_project() {
+    local dir="$1"
+    local package_json="$dir/package.json"
+
+    [[ -f "$package_json" ]] || return 1
+
+    # Make sure it's not a Drupal project (which may also have package.json)
+    ! is_drupal_project "$dir"
+}
+
 # Get Drupal version from composer.lock
 get_drupal_version() {
     local dir="$1"
     local composer_lock="$dir/composer.lock"
 
     if [[ -f "$composer_lock" ]]; then
-        # Extract version from composer.lock using basic grep/sed
         grep -A 5 '"name": "drupal/core"' "$composer_lock" 2>/dev/null | \
         grep '"version"' | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/'
+    else
+        echo "unknown"
+    fi
+}
+
+# Get Node.js project version from package.json
+get_node_version() {
+    local dir="$1"
+    local package_json="$dir/package.json"
+
+    if [[ -f "$package_json" ]]; then
+        grep '"version"' "$package_json" 2>/dev/null | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/'
     else
         echo "unknown"
     fi
@@ -74,31 +59,37 @@ discover_projects() {
     local first=true
     echo "["
 
-    while IFS= read -r search_dir; do
-        [[ -z "$search_dir" ]] && continue
-        [[ ! -d "$search_dir" ]] && continue
+    [[ ! -d "$SEARCH_DIR" ]] && echo "]" && exit 0
 
-        # Find immediate subdirectories
-        for project_dir in "$search_dir"/*/; do
-            [[ ! -d "$project_dir" ]] && continue
-            project_dir="${project_dir%/}"  # Remove trailing slash
+    # Find immediate subdirectories
+    for project_dir in "$SEARCH_DIR"/*/; do
+        [[ ! -d "$project_dir" ]] && continue
+        project_dir="${project_dir%/}"  # Remove trailing slash
 
-            if is_drupal_project "$project_dir"; then
-                project_name=$(basename "$project_dir")
-                drupal_version=$(get_drupal_version "$project_dir")
+        project_name=$(basename "$project_dir")
+        project_type=""
+        project_version=""
 
-                if $first; then
-                    first=false
-                else
-                    echo ","
-                fi
+        if is_drupal_project "$project_dir"; then
+            project_type="drupal"
+            project_version=$(get_drupal_version "$project_dir")
+        elif is_node_project "$project_dir"; then
+            project_type="node"
+            project_version=$(get_node_version "$project_dir")
+        else
+            continue  # Skip non-project directories
+        fi
 
-                # Output JSON object
-                printf '  {"path": "%s", "name": "%s", "drupal_version": "%s"}' \
-                    "$project_dir" "$project_name" "$drupal_version"
-            fi
-        done
-    done < <(parse_search_dirs)
+        if $first; then
+            first=false
+        else
+            echo ","
+        fi
+
+        # Output JSON object
+        printf '  {"path": "%s", "name": "%s", "type": "%s", "version": "%s"}' \
+            "$project_dir" "$project_name" "$project_type" "$project_version"
+    done
 
     echo ""
     echo "]"

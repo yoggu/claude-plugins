@@ -15,8 +15,8 @@
       "skills": ["./skills/drupal-updates"]
     },
     {
-      "name": "drupal-update-orchestrator",
-      "description": "Orchestrate Drupal updates across multiple projects",
+      "name": "update-orchestrator",
+      "description": "Orchestrate dependency updates across multiple Drupal and Node.js projects",
       "source": "./",
       "skills": ["./skills/drupal-update-orchestrator"]
     },

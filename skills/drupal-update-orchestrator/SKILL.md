@@ -1,59 +1,50 @@
 ---
-name: drupal-update-orchestrator
-description: "Orchestrate Drupal updates across multiple projects. Use when asked to update multiple Drupal sites, batch update Drupal projects, manage updates across a portfolio of Drupal sites, or run Drupal updates on several projects at once."
+name: update-orchestrator
+description: "Orchestrate dependency updates across multiple projects. Use when asked to update multiple sites, batch update projects, manage updates across a portfolio of Drupal sites or Node.js projects, or run updates on several projects at once. Supports both Drupal (Composer) and Node.js (npm) projects."
+allowed-tools: Bash(ddev:*), Bash(npm:*), Bash(git:*), Bash(gh:*), Bash(composer:*), Read
 ---
 
-# Drupal Update Orchestrator
+# Update Orchestrator
 
-Orchestrate Drupal core and module updates across multiple projects with automated discovery, user selection, and sequential execution.
+Orchestrate dependency updates across multiple Drupal and Node.js projects with automated discovery, user selection, and sequential execution.
 
 ## Prerequisites
 
-- Claude CLI installed and configured
-- Config file at `~/.config/drupal-update-orchestrator/config.yml`
-- `drupal-updates` skill available (for individual project updates)
-
-## Configuration
-
-Create the config file at `~/.config/drupal-update-orchestrator/config.yml`:
-
-```yaml
-search_directories:
-  - ~/Sites
-  - ~/Projects/drupal
-```
-
-See [references/config-example.yml](references/config-example.yml) for full example.
+- `drupal-updates` skill available (for Drupal projects)
+- `node-modules-update` skill available (for Node.js projects)
 
 ## Workflow
 
 ### Step 1: Discover Projects
 
-Run the discovery script to find Drupal projects:
+Run the discovery script to find all projects in the current directory:
 
 ```bash
 ~/.claude/skills/drupal-update-orchestrator/scripts/discover_projects.sh
 ```
 
-The script scans configured directories for subdirectories containing composer.json with drupal/core dependency.
+The script scans subdirectories (1 level deep) and detects:
+- **Drupal projects**: composer.json with drupal/core dependency
+- **Node.js projects**: package.json without drupal/core
 
 Output format:
 ```json
 [
-  {"path": "/Users/name/Sites/project-a", "name": "project-a", "drupal_version": "10.4.6"},
-  {"path": "/Users/name/Sites/project-b", "name": "project-b", "drupal_version": "10.5.2"}
+  {"path": "/Users/name/Sites/site-a", "name": "site-a", "type": "drupal", "version": "10.4.6"},
+  {"path": "/Users/name/Sites/app-b", "name": "app-b", "type": "node", "version": "1.2.3"}
 ]
 ```
 
 ### Step 2: User Selection
 
-Present the discovered projects as a numbered list:
+Present the discovered projects as a numbered list showing type:
 
 ```
-Available Drupal Projects:
-1. project-a (Drupal 10.4.6)
-2. project-b (Drupal 10.5.2)
-3. project-c (Drupal 10.3.1)
+Available Projects:
+1. [Drupal 10.4.6] site-a
+2. [Drupal 10.5.2] site-b
+3. [Node 1.2.3] app-c
+4. [Node 2.0.0] app-d
 
 Enter project numbers to update (e.g., 1,3 or 1-3 or all):
 ```
@@ -64,44 +55,37 @@ Parse user input:
 - Ranges: `1-3` (expands to 1,2,3)
 - All: `all` or `*`
 
-### Step 3: Launch Interactive Terminals
+### Step 3: Sequential Updates
 
-Launch each selected project in a new Terminal window with an interactive Claude session:
+For each selected project, run the update in sequence:
 
-```bash
-# Launch each update in a new Terminal window
-~/.claude/skills/drupal-update-orchestrator/scripts/run_update.sh /path/to/project-a
-~/.claude/skills/drupal-update-orchestrator/scripts/run_update.sh /path/to/project-b
-~/.claude/skills/drupal-update-orchestrator/scripts/run_update.sh /path/to/project-c
-```
-
-The script:
-1. Opens a new Terminal window
-2. Changes to the project directory
-3. Launches Claude with the drupal-updates skill in interactive mode
-4. User can interact with each Claude session directly
-
-**Note**: Each project opens in its own Terminal window, allowing the user to monitor progress and interact with the update process as needed.
+1. **Change to project directory**
+2. **Announce current project**: Display name and type
+3. **Invoke appropriate skill**:
+   - Drupal projects → use `drupal-updates` skill workflow
+   - Node.js projects → use `node-modules-update` skill workflow
+4. **Track result**: Record success or failure
+5. **Continue to next project**
 
 ### Step 4: Summary
 
-After launching all terminals, display a summary of opened sessions:
+After all updates complete, display a summary:
 
 ```
-=== Drupal Multi-Update Summary ===
+=== Update Summary ===
 
-Opened interactive Terminal sessions for:
-- project-a
-- project-b
-- project-c
+Completed (3):
+✓ site-a (Drupal) - PR created
+✓ site-b (Drupal) - PR created
+✓ app-c (Node) - PR created
 
-You can now interact with each Claude session in its own Terminal window.
+Failed (1):
+✗ app-d (Node) - Build failed
+
+Total: 3 successful, 1 failed
 ```
 
 ## Scripts
 
 ### discover_projects.sh
-Finds Drupal projects in configured directories. Checks composer.json for drupal/core dependency. Outputs JSON array.
-
-### run_update.sh
-Opens a new Terminal window with an interactive Claude session for a single project. The user can interact with Claude directly to guide the update process.
+Finds Drupal and Node.js projects in the current directory (1 level deep). Outputs JSON array with path, name, type, and version for each project.

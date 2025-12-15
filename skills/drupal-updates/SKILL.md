@@ -1,6 +1,7 @@
 ---
 name: drupal-updates
 description: "Perform Drupal core and contributed module updates using Composer. Use when asked to update Drupal core, contrib modules, check for updates, run database updates, or handle patch failures."
+allowed-tools: Bash(ddev:*), Bash(git:*), Bash(gh:*), Bash(composer:*), Read
 ---
 
 # Drupal Updates Skill
@@ -52,7 +53,14 @@ After sync, always clear cache:
 ddev drush cr
 ```
 
-### 3. Create Feature Branch
+### 3. Update Local Main Branch
+Ensure your local main/master branch is up to date:
+```bash
+git checkout main && git pull
+# or: git checkout master && git pull
+```
+
+### 4. Create Feature Branch
 Create a unique branch with timestamp for each update session:
 ```bash
 git checkout -b feature/drupal-updates-$(date +%Y%m%d)
@@ -139,6 +147,25 @@ Use Playwright MCP or manual testing:
 git add composer.json composer.lock config/sync/
 git commit -m "Update Drupal core X.X.X → Y.Y.Y and contrib modules"
 ```
+
+### 11. Create Pull Request
+
+Push the branch and create a pull request:
+
+```bash
+git push -u origin HEAD
+```
+
+**Detect platform and create PR:**
+
+Check the remote URL to determine the platform:
+```bash
+git remote get-url origin
+```
+
+- **GitHub** (github.com): `gh pr create --fill`
+- **Bitbucket** (bitbucket.org): Open the PR URL shown in push output, or construct:
+  `https://bitbucket.org/{workspace}/{repo}/pull-requests/new?source={branch}&t=1`
 
 ## Common Issues
 
