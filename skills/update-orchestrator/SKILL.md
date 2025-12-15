@@ -46,51 +46,59 @@ What type of projects do you want to update?
 
 ### Step 3: Interactive Project Selection
 
-Use `AskUserQuestion` with `multiSelect: true` to let users select projects with checkboxes.
+Use `AskUserQuestion` with multiple questions to show projects across tabs/pages. Each project type gets its own prompt.
 
-**Pagination for large lists:**
-AskUserQuestion supports max 4 options per question. For larger lists, paginate:
+**Rules:**
+- Separate prompts by project type (Drupal first, then Node.js if both selected)
+- Split projects into batches of 4 per page (max 4 options per question)
+- Max 4 pages per prompt (max 4 questions per AskUserQuestion)
+- Only add additional prompts if projects don't fit in one prompt (>16 projects of same type)
+- Question text must be unique - include page number (e.g., "1/3", "2/3")
 
-1. Sort projects alphabetically
-2. Split into batches of 4
-3. Ask each batch with page indicator (e.g., "1/3")
-4. Combine selections from all batches
-
-**Example for 10 Node.js projects:**
-```
-Page 1/3: "Select Node.js projects to update (1/3):"
-  [ ] app-a [1.2.3]
-  [ ] app-b [2.0.0]
-  [ ] app-c [1.0.0]
-  [ ] app-d [3.1.0]
-
-Page 2/3: "Select Node.js projects to update (2/3):"
-  [ ] app-e [1.5.0]
-  [ ] app-f [2.1.0]
-  [ ] app-g [1.0.0]
-  [ ] app-h [4.0.0]
-
-Page 3/3: "Select Node.js projects to update (3/3):"
-  [ ] app-i [1.2.0]
-  [ ] app-j [2.0.0]
-```
-
-**AskUserQuestion format:**
+**Example for 11 Node.js projects - 3 pages in one prompt:**
 ```json
 {
-  "question": "Select Node.js projects to update (1/3):",
-  "header": "Node.js",
-  "multiSelect": true,
-  "options": [
-    {"label": "app-a [1.2.3]", "description": "/path/to/app-a"},
-    {"label": "app-b [2.0.0]", "description": "/path/to/app-b"},
-    {"label": "app-c [1.0.0]", "description": "/path/to/app-c"},
-    {"label": "app-d [3.1.0]", "description": "/path/to/app-d"}
+  "questions": [
+    {
+      "question": "Select Node.js projects to update (1/3):",
+      "header": "Page 1",
+      "multiSelect": true,
+      "options": [
+        {"label": "app-a [1.2.3]", "description": "/path/to/app-a"},
+        {"label": "app-b [2.0.0]", "description": "/path/to/app-b"},
+        {"label": "app-c [1.0.0]", "description": "/path/to/app-c"},
+        {"label": "app-d [3.1.0]", "description": "/path/to/app-d"}
+      ]
+    },
+    {
+      "question": "Select Node.js projects to update (2/3):",
+      "header": "Page 2",
+      "multiSelect": true,
+      "options": [
+        {"label": "app-e [1.5.0]", "description": "/path/to/app-e"},
+        {"label": "app-f [2.1.0]", "description": "/path/to/app-f"},
+        {"label": "app-g [1.0.0]", "description": "/path/to/app-g"},
+        {"label": "app-h [4.0.0]", "description": "/path/to/app-h"}
+      ]
+    },
+    {
+      "question": "Select Node.js projects to update (3/3):",
+      "header": "Page 3",
+      "multiSelect": true,
+      "options": [
+        {"label": "app-i [1.2.0]", "description": "/path/to/app-i"},
+        {"label": "app-j [2.0.0]", "description": "/path/to/app-j"},
+        {"label": "app-k [1.1.0]", "description": "/path/to/app-k"}
+      ]
+    }
   ]
 }
 ```
 
-Collect all selected projects across pages before proceeding to Step 4.
+- Sort projects alphabetically by name
+- Include version in label, path in description
+- User navigates tabs with Tab/Arrow, selects with Space, submits with Enter
+- Combine selections from all pages after submission
 
 ### Step 4: Launch Subagent Updates
 
