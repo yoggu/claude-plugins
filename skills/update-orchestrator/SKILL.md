@@ -17,11 +17,13 @@ Orchestrate dependency updates across multiple Drupal and Node.js projects using
 
 ### Step 1: Discover Projects
 
-Run the discovery script to find all projects in the current directory:
+Run the discovery script to find all projects in the current directory. Use the base directory provided at the top of this skill prompt:
 
 ```bash
-~/.claude/skills/drupal-update-orchestrator/scripts/discover_projects.sh
+{base_directory}/scripts/discover_projects.sh
 ```
+
+Replace `{base_directory}` with the actual "Base directory for this skill" path shown above.
 
 Output format:
 ```json
