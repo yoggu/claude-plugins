@@ -25,6 +25,12 @@
       "description": "Guide for creating effective Claude Code skills",
       "source": "./",
       "skills": ["./skills/skill-creator"]
+    },
+    {
+      "name": "node-modules-update",
+      "description": "Update Node.js project dependencies using npm with proper version control and testing",
+      "source": "./",
+      "skills": ["./skills/node-modules-update"]
     }
   ]
 }
