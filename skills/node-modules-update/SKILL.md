@@ -14,7 +14,9 @@ Perform safe, systematic Node.js dependency updates with proper version control,
 - npm installed
 - Git version control
 
-## Update Workflow
+## Initialization
+
+**Before any update, run these steps first:**
 
 ### 1. Update Local Main Branch
 
@@ -36,7 +38,15 @@ Create a dedicated branch with date for the update:
 git checkout -b chore/update-node-modules-$(date +%Y%m%d)
 ```
 
-### 3. Check Outdated Packages
+**IMPORTANT:** Never perform updates directly on master/main branch.
+
+---
+
+## Update Workflow
+
+**Ensure Initialization steps are complete before proceeding.**
+
+### 1. Check Outdated Packages
 
 Before updating, capture the current state of outdated packages:
 ```bash
@@ -45,7 +55,7 @@ npm outdated
 
 Save this output - you'll need it for the commit message. Note the package names and version changes (Current → Wanted).
 
-### 4. Update Dependencies
+### 2. Update Dependencies
 
 Run npm update to upgrade packages within semver constraints:
 ```bash
@@ -57,7 +67,7 @@ Review output for:
 - Any vulnerabilities found
 - Funding information (optional)
 
-### 5. Run Lint
+### 3. Run Lint
 
 Run linting to check for issues:
 ```bash
@@ -70,7 +80,7 @@ npm run lint
 3. Re-run lint to verify fixes
 4. Only skip the update if the fix is too complex or risky
 
-### 6. Verify Build
+### 4. Verify Build
 
 Run the build to ensure updated packages work correctly:
 ```bash
@@ -86,7 +96,7 @@ npm run build
 3. Re-run the build to verify fixes
 4. Only skip the update if the fix is too complex or requires significant refactoring
 
-### 7. Run Tests
+### 5. Run Tests
 
 Execute the test suite to catch regressions:
 ```bash
@@ -100,7 +110,7 @@ npm run test
 4. Re-run tests to verify fixes
 5. Only skip the update if fixes are too complex
 
-### 8. Review Changes
+### 6. Review Changes
 
 Check what files were modified:
 ```bash
@@ -111,7 +121,7 @@ Expected changes:
 - `package-lock.json` - Updated dependency tree
 - Any source files you fixed during lint/build/test steps
 
-### 9. Commit Changes
+### 7. Commit Changes
 
 Stage and commit the update with detailed version information:
 ```bash
@@ -134,9 +144,9 @@ Updated packages:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
-Use the output from step 3 (`npm outdated`) to list all packages that were updated.
+Use the output from step 1 (`npm outdated`) to list all packages that were updated.
 
-### 10. Create Pull Request
+### 8. Create Pull Request
 
 Push the branch and create a pull request:
 
