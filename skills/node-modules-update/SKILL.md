@@ -14,6 +14,19 @@ Perform safe, systematic Node.js dependency updates with proper version control,
 - npm installed
 - Git version control
 
+## Update Scope
+
+By default, this skill performs:
+- Patch version updates (x.x.1 → x.x.2)
+- Minor version updates (x.1.x → x.2.x)
+
+This skill does not:
+- Upgrade major versions (1.x.x → 2.x.x) - these often have breaking changes
+- Modify package.json - package-lock.json is the expected change
+- Use `npm install package@version` - this modifies package.json
+
+For major version upgrades: User should explicitly request them. These require careful review and should be handled separately.
+
 ## Initialization
 
 **Before any update, run these steps first:**
@@ -61,6 +74,11 @@ Run npm update to upgrade packages within semver constraints:
 ```bash
 npm update
 ```
+
+Note:
+- This command updates package-lock.json
+- It respects semver ranges in package.json (patch/minor)
+- If `npm outdated` shows packages where Current = Wanted, those are major version updates - skip them unless requested
 
 Review output for:
 - Number of packages added/removed/changed
@@ -174,13 +192,16 @@ If npm reports peer dependency issues:
 npm update --legacy-peer-deps
 ```
 
-### Major Version Updates
+### Major Version Updates (When Explicitly Requested)
 
-For major version upgrades (breaking changes), use:
+Do not perform major version upgrades unless the user specifically asks.
+
+If explicitly requested:
 ```bash
-npm outdated
 npm install package-name@latest
 ```
+
+Note: This modifies package.json and may introduce breaking changes. Verify build/tests pass.
 
 ### Security Vulnerabilities
 
@@ -200,8 +221,12 @@ npm install
 
 ## Files Modified
 
-- `package-lock.json` - Locked dependency versions (always)
-- `package.json` - Only if using `npm install` with specific versions
+Expected changes (normal update):
+- `package-lock.json` - Updated dependency tree
+
+Not expected (unless explicitly requested):
+- `package.json` - Should not be modified during normal updates
+- If package.json was modified, review the commands used
 
 ## Rollback
 
