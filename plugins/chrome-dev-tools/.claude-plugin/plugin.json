@@ -1,7 +1,0 @@
-{
-  "name": "chrome-dev-tools",
-  "description": "Browser testing and debugging using Chrome DevTools MCP server",
-  "author": {
-    "name": "yoggu"
-  }
-}

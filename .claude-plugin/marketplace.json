@@ -37,11 +37,6 @@
       "name": "commit-commands",
       "description": "Git commit helper command that stages changes and creates commits with context-aware messages",
       "source": "./plugins/commit-commands"
-    },
-    {
-      "name": "chrome-dev-tools",
-      "description": "Browser testing and debugging using Chrome DevTools MCP server",
-      "source": "./plugins/chrome-dev-tools"
     }
   ]
 }
