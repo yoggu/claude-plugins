@@ -37,6 +37,12 @@
       "description": "Manage git worktrees for feature development - create, delete, and list worktrees",
       "source": "./",
       "skills": ["./skills/worktree-manager"]
+    },
+    {
+      "name": "commit-commands",
+      "description": "Git commit helper command that stages changes and creates commits with context-aware messages",
+      "source": "./",
+      "commands": ["./commands/commit-commands"]
     }
   ]
 }
