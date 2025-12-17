@@ -31,6 +31,12 @@
       "description": "Update Node.js project dependencies using npm with proper version control and testing",
       "source": "./",
       "skills": ["./skills/node-modules-update"]
+    },
+    {
+      "name": "worktree-manager",
+      "description": "Manage git worktrees for feature development - create, delete, and list worktrees",
+      "source": "./",
+      "skills": ["./skills/worktree-manager"]
     }
   ]
 }
