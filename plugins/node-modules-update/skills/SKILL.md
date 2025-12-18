@@ -1,7 +1,7 @@
 ---
 name: node-modules-update
 description: "Update Node.js project dependencies using npm. Use when asked to update node modules, npm packages, dependencies, or perform npm update. Handles branch creation, dependency updates, build verification, and test execution."
-allowed-tools: Bash(npm:*), Bash(git:*), Bash(gh:*), Read
+allowed-tools: Bash(npm:*), Bash(git:*), Bash(gh:*), Bash(bb:*), Read
 ---
 
 # Node Modules Update
@@ -180,8 +180,15 @@ git remote get-url origin
 ```
 
 - **GitHub** (github.com): `gh pr create --fill`
-- **Bitbucket** (bitbucket.org): Open the PR URL shown in push output, or construct:
-  `https://bitbucket.org/{workspace}/{repo}/pull-requests/new?source={branch}&t=1`
+- **Bitbucket** (bitbucket.org):
+  ```bash
+  # Detect default branch (main or master)
+  DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+  bb pullrequest create \
+    --title "chore: update node modules" \
+    --source "$(git branch --show-current)" \
+    --destination "$DEFAULT_BRANCH"
+  ```
 
 ## Common Issues
 

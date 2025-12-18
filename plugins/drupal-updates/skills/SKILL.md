@@ -1,7 +1,7 @@
 ---
 name: drupal-updates
 description: "Perform Drupal core and contributed module updates using Composer. Use when asked to update Drupal core, contrib modules, check for updates, run database updates, or handle patch failures."
-allowed-tools: Bash(ddev:*), Bash(git:*), Bash(gh:*), Bash(composer:*), Read
+allowed-tools: Bash(ddev:*), Bash(git:*), Bash(gh:*), Bash(bb:*), Bash(composer:*), Read
 ---
 
 # Drupal Updates Skill
@@ -193,8 +193,15 @@ git remote get-url origin
 ```
 
 - **GitHub** (github.com): `gh pr create --fill`
-- **Bitbucket** (bitbucket.org): Open the PR URL shown in push output, or construct:
-  `https://bitbucket.org/{workspace}/{repo}/pull-requests/new?source={branch}&t=1`
+- **Bitbucket** (bitbucket.org):
+  ```bash
+  # Detect default branch (main or master)
+  DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+  bb pullrequest create \
+    --title "chore: update Drupal core and contrib modules" \
+    --source "$(git branch --show-current)" \
+    --destination "$DEFAULT_BRANCH"
+  ```
 
 ## Common Issues
 
